@@ -58,5 +58,8 @@ fun NavGraphSetup(
                 onBackClick = { navController.navigateUp() }
             )
         }
+        composable<Routes.ProfileScreen> {
+
+        }
     }
 }

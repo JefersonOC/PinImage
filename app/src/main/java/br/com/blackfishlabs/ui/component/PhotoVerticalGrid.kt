@@ -1,6 +1,7 @@
 package br.com.blackfishlabs.ui.component
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -8,6 +9,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import br.com.blackfishlabs.domain.model.PhotoModel
 
@@ -15,7 +17,9 @@ import br.com.blackfishlabs.domain.model.PhotoModel
 fun PhotoVerticalGrid(
     modifier: Modifier = Modifier,
     photos: List<PhotoModel?>,
-    onImageClick: (String) -> Unit
+    onImageClick: (String) -> Unit,
+    onImageDragStart: (PhotoModel?) -> Unit,
+    onImageDragEnd: () -> Unit
 ) {
     LazyVerticalStaggeredGrid(
         modifier = modifier,
@@ -27,7 +31,17 @@ fun PhotoVerticalGrid(
         items(photos) { image ->
             PhotoCard(
                 photo = image,
-                modifier = Modifier.clickable { image?.id?.let { onImageClick(it) } }
+                modifier = Modifier
+                    .clickable { image?.id?.let { onImageClick(it) } }
+                    .pointerInput(Unit) { 
+                        detectDragGesturesAfterLongPress(
+                            onDragStart = {onImageDragStart(image)},
+                            onDragCancel = {onImageDragEnd()},
+                            onDragEnd = {onImageDragEnd()},
+                            onDrag = {_,_ ->}
+                        )
+                    }
+                
             )
         }
     }

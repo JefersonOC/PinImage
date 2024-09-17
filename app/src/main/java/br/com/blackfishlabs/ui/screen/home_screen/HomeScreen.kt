@@ -12,12 +12,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import br.com.blackfishlabs.domain.model.PhotoModel
 import br.com.blackfishlabs.ui.component.PhotoVerticalGrid
 import br.com.blackfishlabs.ui.component.TopAppBar
+import br.com.blackfishlabs.ui.component.ZoomedImageCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,6 +33,9 @@ fun HomeScreen(
     onSearchClick: () -> Unit,
     onFabClick: () -> Unit
 ) {
+    var showImagePreview by remember { mutableStateOf(false) }
+    var activeImage by remember { mutableStateOf<PhotoModel?>(null) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -39,7 +47,12 @@ fun HomeScreen(
             )
             PhotoVerticalGrid(
                 photos = photos,
-                onImageClick = onImageClick
+                onImageClick = onImageClick,
+                onImageDragStart = { image ->
+                    activeImage = image
+                    showImagePreview = true
+                },
+                onImageDragEnd = { showImagePreview = false }
             )
         }
         FloatingActionButton(
@@ -53,5 +66,10 @@ fun HomeScreen(
                 tint = MaterialTheme.colorScheme.primary
             )
         }
+        ZoomedImageCard(
+            modifier = Modifier.padding(20.dp),
+            isVisible = showImagePreview,
+            photo = activeImage,
+        )
     }
 }
